@@ -1,3 +1,4 @@
+//Database model for the property information, saved as strings.
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 

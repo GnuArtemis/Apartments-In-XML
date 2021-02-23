@@ -1,19 +1,29 @@
+// A function that calls the XML from the source, parses and sorts it, and returns the property ID, name, email, and basic unit information about each property.
+
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 const parseString = require('xml2js').parseString;
 
-async function loadNew() {
+async function loadNew(city) {
     function collectInfo() {
         return new Promise((resolve, reject) => {
-
+            //Properties contains all the information about each property, and will eventually be returned.
             const properties = [];
+
+            //A callback function to be usedupon connection to the XML source data. Parse String is a function from an extenal library  
+            //that parses the returned XML into JSON format.  This messy object is then sorted through for relevant data.
             function reqListener() {
                 parseString(this.responseText, (err, res) => {
                     if (err) reject(err)
                     const apartmentData = res.PhysicalProperty.Property;
-                    sortResponses(apartmentData, "Madison")
+                    sortResponses(apartmentData, city)
                 })
             }
 
+            /*
+            The sort and filter function after retrieving XML data: it limits the data requested to only those 
+            properties residing in a particular city, then extracts property ID, name, email, and basic unit 
+            information (including number of bedrooms per unit). When the sorting is complete, the promise is resolved.
+            */
             function sortResponses(listingComposite, city) {
                 listingComposite.forEach(element => {
                     if (element.PropertyID[0].Address[0].City[0] === city) {
@@ -42,6 +52,7 @@ async function loadNew() {
                 resolve(properties);
             }
 
+            //The request to the XML source, when sent the reqListener function from above is executed and a promise containing the sorted data is returned.
             const oReq = new XMLHttpRequest();
             oReq.addEventListener("load", reqListener);
             oReq.open("GET", "https://s3.amazonaws.com/abodo-misc/sample_abodo_feed.xml");
@@ -49,8 +60,9 @@ async function loadNew() {
         })
     }
 
-    const properties = await collectInfo();
-    return properties;
+    //Returns the information retrieved from the combination of asynchronous functions.
+    return  collectInfo();
 }
 
-module.exports = loadNew();
+//Allows this function to be called on demand based on events determined in other files, specifically for the city of "Madison"
+module.exports = loadNew("Madison");

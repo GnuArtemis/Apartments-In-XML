@@ -1,9 +1,12 @@
+//Backend Routes for accessibility.
+
 const mongoose = require('mongoose');
 const router = require("express").Router();
 
 const apartmentDB = require("../models/Apartment");
 const searchXML = require("../utils/searchXML")
 
+//Retrieves current data from the provided XML source, and returns a JSON representation.
 router.get("/listings", (req,res)=> {
     const newListings = searchXML;
     newListings.then(data => {
@@ -13,6 +16,7 @@ router.get("/listings", (req,res)=> {
     })
 })
 
+//Retrieves all data saved in the database.
 router.get("/savedListings",(req,res)=> {
     apartmentDB.find({})
     .then(dbApartments => {
@@ -22,6 +26,7 @@ router.get("/savedListings",(req,res)=> {
     })
 })
 
+//Saves the information retrieved from the XML source to the database.
 router.post("/save", (req,res) => {
     const newListings = searchXML;
     newListings.then(data => {
