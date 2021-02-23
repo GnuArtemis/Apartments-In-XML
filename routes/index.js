@@ -6,8 +6,9 @@ const router = require("express").Router();
 const apartmentDB = require("../models/Apartment");
 const searchXML = require("../utils/searchXML")
 
+
 //Retrieves current data from the provided XML source, and returns a JSON representation.
-router.get("/listings", (req,res)=> {
+router.get("/", (req,res)=> {
     const newListings = searchXML;
     newListings.then(data => {
         res.send(data)
